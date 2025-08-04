@@ -49,6 +49,7 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 	private Button fCalculateUses;
 	private Button fAddMissing;
 	private Button fMarkInternal;
+	private Button fAutoMatching;
 	private Text fPackageFilter;
 	private Label fPackageFilterLabel;
 	private Button fRemoveImport;
@@ -61,6 +62,7 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 	private Button fRemovedUnusedKeys;
 	private Button fRemoveLazy;
 	private Button fRemoveUselessFiles;
+	private Button fAutoMatchVersions;
 
 	private Button[] fTopLevelButtons; // used for setting page complete state
 
@@ -192,6 +194,10 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 
 		fComputeImportPackages = new Button(group, SWT.CHECK);
 		fComputeImportPackages.setText(PDEUIMessages.OrganizeManifestsWizardPage_computeImports);
+		//Auto version matching
+		fAutoMatching = new Button(group, SWT.CHECK);
+		fAutoMatching.setText(PDEUIMessages.OrganizeManifestsWizardPage_autoMatching);
+		
 	}
 
 	private void createGeneralGroup(Composite container) {
@@ -202,6 +208,9 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 
 		fRemoveUselessFiles = new Button(group, SWT.CHECK);
 		fRemoveUselessFiles.setText(PDEUIMessages.OrganizeManifestsWizardPage_uselessPluginFile);
+
+		fAutoMatchVersions = new Button(group, SWT.CHECK);
+		fAutoMatchVersions.setText(PDEUIMessages.OrganizeManifestsWizardPage_autoMatchVersions);
 
 	}
 
@@ -221,6 +230,11 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 		boolean selection = !settings.getBoolean(PROP_ADD_MISSING);
 		fAddMissing.setSelection(selection);
 		fProcessor.setAddMissing(selection);
+		
+		//Auto version matching
+		boolean selection = settings.getBoolean(PROP_MATCH_BUNDLE_VERSIONS);
+		fMatchBundleVersions.setSelection(selection);
+		fProcessor.setMatchBundleVersions(selection);
 
 		selection = !settings.getBoolean(PROP_MARK_INTERNAL);
 		fMarkInternal.setSelection(selection);
@@ -278,6 +292,10 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 		fRemovedUnusedKeys.setSelection(selection);
 		fProcessor.setUnusedKeys(selection);
 
+		selection = settings.getBoolean(PROP_AUTO_MATCH_VERSIONS);
+		fAutoMatchVersions.setSelection(selection);
+		fProcessor.setAutoMatchVersions(selection);
+
 		setEnabledStates();
 		setPageComplete();
 	}
@@ -290,6 +308,9 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 		settings.put(PROP_INTERAL_PACKAGE_FILTER, fPackageFilter.getText());
 		settings.put(PROP_REMOVE_UNRESOLVED_EX, !fRemoveUnresolved.getSelection());
 		settings.put(PROP_CALCULATE_USES, fCalculateUses.getSelection());
+		
+		//Auto version matching
+		settings.put(PROP_MATCH_BUNDLE_VERSIONS, fAutoMatching.getSelection()
 
 		settings.put(PROP_MODIFY_DEP, !fModifyDependencies.getSelection());
 		settings.put(PROP_RESOLVE_IMP_MARK_OPT, fOptionalImport.getSelection());
@@ -302,6 +323,7 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 
 		settings.put(PROP_NLS_PATH, fFixIconNLSPaths.getSelection());
 		settings.put(PROP_UNUSED_KEYS, fRemovedUnusedKeys.getSelection());
+		settings.put(PROP_AUTO_MATCH_VERSIONS, fAutoMatchVersions.getSelection());
 	}
 
 	private void setEnabledStates() {
@@ -318,7 +340,7 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 	private void setButtonArrays() {
 		fTopLevelButtons = new Button[] { fRemoveUnresolved, fAddMissing, fModifyDependencies, fMarkInternal,
 				fUnusedDependencies, fAdditonalDependencies, fComputeImportPackages, fFixIconNLSPaths,
-				fRemovedUnusedKeys, fRemoveLazy, fRemoveUselessFiles, fCalculateUses };
+				fRemovedUnusedKeys, fRemoveLazy, fRemoveUselessFiles, fCalculateUses, fAutoMatchVersions, fAutoMatching}; // Add fAutoMatching
 	}
 
 	private void setPageComplete() {
@@ -380,6 +402,12 @@ public class OrganizeManifestsWizardPage extends UserInputWizardPage implements 
 			fProcessor.setPrefixIconNL(fFixIconNLSPaths.getSelection());
 		} else if (fRemovedUnusedKeys.equals(source)) {
 			fProcessor.setUnusedKeys(fRemovedUnusedKeys.getSelection());
+		} else if (fAutoMatchVersions.equals(source)) {
+			fProcessor.setAutoMatchVersions(fAutoMatchVersions.getSelection());
+		}
+		//Auto Matching
+		else if (fAutoMatching.equals(source)) {
+		    fProcessor.setMatchBundleVersions(fMatchBundleVersions.getSelection());
 		}
 	}
 

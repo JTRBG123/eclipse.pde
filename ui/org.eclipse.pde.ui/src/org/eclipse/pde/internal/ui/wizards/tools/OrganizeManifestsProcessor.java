@@ -72,7 +72,14 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 	protected boolean fUnusedKeys = false; // remove unused
 											// <bundle-localization>.properties
 											// keys
+	
+	
+	protected boolean fAutoMatching = false;  //Auto matching version to the one in workspace
+
 	protected boolean fAddDependencies = false;
+	protected boolean fAutoMatchVersions = false;
+	
+	
 
 	List<IProject> fProjectList;
 	private IProject fCurrentProject;
@@ -113,6 +120,11 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 			}
 		}
 		return change;
+	}
+	//// Auto version matching 
+	Public boolean isMatchBundleVersions() 
+	{
+		return fAutoMatching;
 	}
 
 	private CompositeChange cleanProject(IProject project, IProgressMonitor monitor) {
@@ -184,6 +196,7 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 			}
 			subMonitor.worked(1);
 		}
+		
 
 		if (fModifyDep) {
 			String message = fRemoveDependencies
@@ -267,6 +280,14 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 		if (fComputeImports) {
 			OrganizeManifest.computeImportPackages(modelBase, fCurrentProject, subMonitor.split(1));
 		}
+		
+		if (fAutoMatchVersions) {
+			subMonitor.subTask(NLS.bind(PDEUIMessages.OrganizeManifestsOperation_matchVersions, projectName));
+			if (!subMonitor.isCanceled()) {
+				OrganizeManifest.matchVersionsToWorkspace(currentBundle, fCurrentProject);
+			}
+			subMonitor.worked(1);
+		}
 		subMonitor.setWorkRemaining(0);
 	}
 
@@ -283,6 +304,10 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 	@Override
 	public String getProcessorName() {
 		return PDEUIMessages.OrganizeManifestsWizardPage_title;
+	}
+	@Override
+	public String getAutoVersionMatching() {
+		return 
 	}
 
 	@Override
@@ -303,6 +328,12 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 	public void setMarkInternal(boolean markInternal) {
 		fMarkInternal = markInternal;
 	}
+	
+	//Auto Matching
+	 public void setAutoMatching(boolean autoMatching){
+	 fAutoMatching = autoMatching;
+	 }
+
 
 	public void setPackageFilter(String packageFilter) {
 		fPackageFilter = packageFilter;
@@ -350,5 +381,9 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 
 	public void setComputeImports(boolean computeImports) {
 		this.fComputeImports = computeImports;
+	}
+
+	public void setAutoMatchVersions(boolean autoMatchVersions) {
+		fAutoMatchVersions = autoMatchVersions;
 	}
 }
