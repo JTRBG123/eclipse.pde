@@ -74,10 +74,9 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 											// keys
 	
 	
-	protected boolean fAutoMatching = false;  //Auto matching version to the one in workspace
+	protected boolean fAutoMatching = false;  //auto version matching is disabled by default
 
 	protected boolean fAddDependencies = false;
-	protected boolean fAutoMatchVersions = false;
 	
 	
 
@@ -121,10 +120,11 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 		}
 		return change;
 	}
-	//// Auto version matching 
-	Public boolean isMatchBundleVersions() 
+	
+	// Returns true if auto version matching is enabled
+	public boolean isAutoMatchingEnabled() 
 	{
-		return fAutoMatching;
+	    return fAutoMatching;
 	}
 
 	private CompositeChange cleanProject(IProject project, IProgressMonitor monitor) {
@@ -281,13 +281,22 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 			OrganizeManifest.computeImportPackages(modelBase, fCurrentProject, subMonitor.split(1));
 		}
 		
-		if (fAutoMatchVersions) {
+		
+		/*
+		 *  Check if the "Auto-match versions" checkbox is selected.
+		 *  If selected, this function attempts to automatically match the plugin's
+		 *   dependency versions to those available in the current workspace.
+		 *   It updates the current bundle's version information using the workspace context.
+		 *   The process runs as a subtask and respects cancellation requests.
+		 */
+		if (fAutoMatching) {
 			subMonitor.subTask(NLS.bind(PDEUIMessages.OrganizeManifestsOperation_matchVersions, projectName));
 			if (!subMonitor.isCanceled()) {
 				OrganizeManifest.matchVersionsToWorkspace(currentBundle, fCurrentProject);
 			}
 			subMonitor.worked(1);
 		}
+		
 		subMonitor.setWorkRemaining(0);
 	}
 
@@ -305,10 +314,7 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 	public String getProcessorName() {
 		return PDEUIMessages.OrganizeManifestsWizardPage_title;
 	}
-	@Override
-	public String getAutoVersionMatching() {
-		return 
-	}
+
 
 	@Override
 	public boolean isApplicable() throws CoreException {
@@ -329,11 +335,13 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 		fMarkInternal = markInternal;
 	}
 	
-	//Auto Matching
-	 public void setAutoMatching(boolean autoMatching){
-	 fAutoMatching = autoMatching;
-	 }
-
+	/*
+	 * Enables or disables the auto version matching feature based on the checkbox selection.
+	 * When set to true, dependencies will be matched to versions available in the workspace.
+	 */
+	public void setAutoMatching(boolean autoMatching) {
+	    fAutoMatching = autoMatching;
+	}
 
 	public void setPackageFilter(String packageFilter) {
 		fPackageFilter = packageFilter;
@@ -383,7 +391,5 @@ public class OrganizeManifestsProcessor extends RefactoringProcessor implements 
 		this.fComputeImports = computeImports;
 	}
 
-	public void setAutoMatchVersions(boolean autoMatchVersions) {
-		fAutoMatchVersions = autoMatchVersions;
-	}
+	
 }

@@ -3030,6 +3030,12 @@ public class PDEUIMessages extends NLS {
 
 	public static String OrganizeManifestsWizardPage_uselessPluginFile;
 
+	// Message key for the "Auto Matching" checkbox label in the Organize Manifests Wizard page.
+	// This string is loaded from the properties file to support localization.
+	public static String OrganizeManifestsWizardPage_autoMatching;
+	
+	public static String OrganizeManifestsOperation_matchVersions;
+
 	public static String OrganizeManifestsWizardPage_internationalizationGroup;
 
 	public static String OrganizeManifestsWizardPage_prefixNL;
